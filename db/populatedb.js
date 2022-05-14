@@ -59,6 +59,31 @@ const buildMedia = async (obj, cb) => {
   });
 };
 
+const buildUser = async (obj, cb) => {
+  
+  const user = new User({
+    email: obj.email,
+    password: obj.password,
+    name: obj.name,
+    family_name: obj.family_name,
+    address: obj.address,
+    city: obj.city,
+    state: obj.state,
+    zip_code: obj.zip_code,
+    bank_details: obj.bank_details,
+    subscription_status: obj.subscription_status
+  });
+
+  user.save( (err) => {
+    if (err) {
+      cb(err, null);
+      return;
+    }
+    console.log('New User:', user.email);
+    cb(null, user);
+  });
+}
+
 const createGenres = cb => {
   const raw = fs.readFileSync(path.resolve(__dirname, './sample_data/genres-data.json'));
   const genreSamples = JSON.parse(raw);
@@ -79,9 +104,21 @@ const createMedias = cb => {
   }), cb);
 };
 
+const createUsers = cb => {
+  const raw = fs.readFileSync(path.resolve(__dirname, './sample_data/user-data.json'));
+  const userSamples = JSON.parse(raw);
+  async.series( userSamples.map( obj => {
+    return (callback) => {
+      buildUser(obj, callback)
+    };
+  }), cb);
+};
+
+
 async.series([
-  createGenres,
-  createMedias,
+  // createGenres,
+  // createMedias,
+  // createUsers,
 ], (err, results) => {
   if (err) { console.log('FINAL ERR:', err); }
   else console.log('All saved');
