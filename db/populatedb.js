@@ -1,13 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const async = require('async');
+const bcrypt = require('bcrypt');
 
 const mongo = require('./mongo');
 
 // Models
 const Media = require('../models/media');
 const Genre = require('../models/genre');
-const User = require('../models/user'); // NOT IMPLEMENTED
+const User = require('../models/user');
 
 mongo.connect();
 
@@ -61,27 +62,32 @@ const buildMedia = async (obj, cb) => {
 
 const buildUser = async (obj, cb) => {
   
-  const user = new User({
-    email: obj.email,
-    password: obj.password,
-    name: obj.name,
-    family_name: obj.family_name,
-    address: obj.address,
-    city: obj.city,
-    state: obj.state,
-    zip_code: obj.zip_code,
-    bank_details: obj.bank_details,
-    subscription_status: obj.subscription_status
-  });
-
-  user.save( (err) => {
+  bcrypt.hash(obj.password, 10, (err, hashedPassword) => {
     if (err) {
-      cb(err, null);
+      console.log(err);
       return;
     }
-    console.log('New User:', user.email);
-    cb(null, user);
-  });
+    const user = new User({
+      email: obj.email,
+      password: hashedPassword,
+      name: obj.name,
+      family_name: obj.family_name,
+      address: obj.address,
+      city: obj.city,
+      state: obj.state,
+      zip_code: obj.zip_code,
+      bank_details: obj.bank_details,
+      subscription_status: obj.subscription_status
+    });
+    user.save( (err) => {
+      if (err) {
+        cb(err, null);
+        return;
+      }
+      console.log('New User:', user.email);
+      cb(null, user);
+    });
+  })
 }
 
 const createGenres = cb => {
@@ -118,7 +124,7 @@ const createUsers = cb => {
 async.series([
   // createGenres,
   // createMedias,
-  // createUsers,
+  createUsers,
 ], (err, results) => {
   if (err) { console.log('FINAL ERR:', err); }
   else console.log('All saved');
