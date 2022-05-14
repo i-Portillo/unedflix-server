@@ -15,7 +15,7 @@ const MediaSchema = new Schema(
     cast: { type: [String] },
     production: { type: String },
     imdb_id: { type: String },
-    poster: { data: Buffer, contentType: String }
+    poster: { type: String }
   }
 )
 

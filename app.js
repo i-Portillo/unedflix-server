@@ -20,29 +20,17 @@ mongo.connect();
 
 app.use(cors());
 
+app.use(express.static('public'));
+
 app.get('/', (req, res, next) => {
 
-  // const genre = new Genre(
-  //   { name: 'Test' }
-  // );
-  // genre.save( err => {
-  //   if (err) { return next(err); }
-  //   res.send('Movie-App Express Server.');
-  // })
-  Media.findOne({}, (err, obj) => {
-    res.send('Hello World!');
+  Media.findOne({}, (err, obj) => { 
+    if (err) { res.send(`Movie not found`) }
+    res.write(`<img src="${obj.poster}">`);
+    res.end();
+    // res.sendFile(__dirname + `/public/images/movie_posters/${obj.media_id}.jpg`)
   });
-
-  
   
 });
-
-const genre = new Genre(
-  { name: 'Test' }
-);
-genre.save( err => {
-  if (err) { console.log(err); }
-  
-})
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

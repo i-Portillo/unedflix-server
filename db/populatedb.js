@@ -46,10 +46,7 @@ const buildMedia = async (obj, cb) => {
     director: obj.director,
     production: obj.production,
     imdb_id: obj.imdb_id,
-    poster: {
-      data: fs.readFileSync(path.join(__dirname + `/sample_data/movie_posters/${obj.media_id}.jpg`)),
-      contentType: 'image/jpg'
-    }
+    poster: `/images/movie_posters/${obj.media_id}.jpg`
   })
 
   media.save( (err) => {
@@ -83,7 +80,7 @@ const createMedias = cb => {
 };
 
 async.series([
-  //createGenres,
+  createGenres,
   createMedias,
 ], (err, results) => {
   if (err) { console.log('FINAL ERR:', err); }
