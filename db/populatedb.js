@@ -4,11 +4,16 @@ const async = require('async');
 const bcrypt = require('bcrypt');
 
 const mongo = require('./mongo');
+const genreAffinity = require('./../suggestion_system/genreAffinity');
 
 // Models
-const Media = require('../models/media');
 const Genre = require('../models/genre');
+const Media = require('../models/media');
 const User = require('../models/user');
+
+let genres = [];
+let medias = [];
+let users = [];
 
 mongo.connect();
 
@@ -23,6 +28,7 @@ const buildGenre = (obj, cb) => {
       return;
     }
     console.log('New Genre:', genre.name);
+    genres.push(genre);
     cb(null, genre);
   });
 }
@@ -56,6 +62,7 @@ const buildMedia = async (obj, cb) => {
       return;
     }
     console.log('New Media:', media.title);
+    medias.push(media);
     cb(null, media);
   });
 };
@@ -67,6 +74,15 @@ const buildUser = async (obj, cb) => {
       console.log(err);
       return;
     }
+
+    const defaultAffinity = 50;
+    const affinities = genres.map( genre => {
+      return {
+        genre: genre.name,
+        value: defaultAffinity
+      };
+    })
+
     const user = new User({
       email: obj.email,
       password: hashedPassword,
@@ -77,7 +93,8 @@ const buildUser = async (obj, cb) => {
       state: obj.state,
       zip_code: obj.zip_code,
       bank_details: obj.bank_details,
-      subscription_status: obj.subscription_status
+      subscription_status: obj.subscription_status,
+      genre_affinity: affinities
     });
     user.save( (err) => {
       if (err) {
@@ -85,6 +102,7 @@ const buildUser = async (obj, cb) => {
         return;
       }
       console.log('New User:', user.email);
+      users.push(user);
       cb(null, user);
     });
   })
@@ -122,8 +140,8 @@ const createUsers = cb => {
 
 
 async.series([
-  // createGenres,
-  // createMedias,
+  createGenres,
+  createMedias,
   createUsers,
 ], (err, results) => {
   if (err) { console.log('FINAL ERR:', err); }

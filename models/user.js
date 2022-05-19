@@ -13,7 +13,11 @@ const UserSchema = new Schema(
     state: { type: String },
     zip_code: { type: String },
     bank_details: { type: String },
-    subscription_status: { type: String }
+    subscription_status: { type: String },
+    genre_affinity: [{
+      genre: { type: String },
+      value: { type: Number }
+    }]
   }
 )
 
