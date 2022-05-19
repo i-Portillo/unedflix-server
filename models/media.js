@@ -15,7 +15,9 @@ const MediaSchema = new Schema(
     cast: { type: [String] },
     production: { type: String },
     imdb_id: { type: String },
-    poster: { type: String }
+    poster: { type: String },
+    updated: { type: Date },
+    media_src: [ { type: Schema.Types.ObjectId, ref: 'MediaSrc'} ]
   }
 )
 

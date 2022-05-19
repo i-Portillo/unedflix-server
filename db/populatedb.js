@@ -4,12 +4,13 @@ const async = require('async');
 const bcrypt = require('bcrypt');
 
 const mongo = require('./mongo');
-const genreAffinity = require('./../suggestion_system/genreAffinity');
+const genreAffinity = require('../suggestion_system/genreAffinity');
 
 // Models
 const Genre = require('../models/genre');
 const Media = require('../models/media');
 const User = require('../models/user');
+const MediaSrc = require('../models/mediaSrc');
 
 let genres = [];
 let medias = [];
@@ -53,8 +54,16 @@ const buildMedia = async (obj, cb) => {
     director: obj.director,
     production: obj.production,
     imdb_id: obj.imdb_id,
-    poster: `/images/movie_posters/${obj.media_id}.jpg`
+    poster: `/images/movie_posters/${obj.media_id}.jpg`,
+    updated: obj.release_date,
   })
+
+  const mediaSrc = new MediaSrc({
+    media: media,
+    src: `/media/video.mp4`
+  })
+
+  media.media_src = [ mediaSrc ];
 
   media.save( (err) => {
     if (err) {
@@ -63,6 +72,13 @@ const buildMedia = async (obj, cb) => {
     }
     console.log('New Media:', media.title);
     medias.push(media);
+    mediaSrc.save( (err) => {
+      if (err) {
+        cb(err, null);
+        return;
+      }
+      console.log('Added MediaSrc');
+    })
     cb(null, media);
   });
 };
