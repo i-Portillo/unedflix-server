@@ -17,7 +17,9 @@ const UserSchema = new Schema(
     genre_affinity: [{
       genre: { type: String },
       value: { type: Number }
-    }]
+    }],
+    view_logs: [ { type: Schema.Types.ObjectId, ref: 'ViewLog' } ],
+    media_reviews: [ { type: Schema.Types.ObjectId, ref: 'MediaReview' } ]
   }
 )
 

@@ -4,13 +4,15 @@ const async = require('async');
 const bcrypt = require('bcrypt');
 
 const mongo = require('./mongo');
-const genreAffinity = require('../suggestion_system/genreAffinity');
+const { increaseAffinity, decreaseAffinity, evaluateMedia } = require('../suggestion_system/genreAffinity');
 
 // Models
 const Genre = require('../models/genre');
 const Media = require('../models/media');
 const User = require('../models/user');
 const MediaSrc = require('../models/mediaSrc');
+const ViewLog = require('../models/viewLog');
+const MediaReview = require('../models/mediaReview');
 
 let genres = [];
 let medias = [];
@@ -28,7 +30,7 @@ const buildGenre = (obj, cb) => {
       cb(err, null);
       return;
     }
-    console.log('New Genre:', genre.name);
+    // console.log('New Genre:', genre.name);
     genres.push(genre);
     cb(null, genre);
   });
@@ -70,14 +72,14 @@ const buildMedia = async (obj, cb) => {
       cb(err, null);
       return;
     }
-    console.log('New Media:', media.title);
+    // console.log('New Media:', media.title);
     medias.push(media);
     mediaSrc.save( (err) => {
       if (err) {
         cb(err, null);
         return;
       }
-      console.log('Added MediaSrc');
+      // console.log('Added MediaSrc');
     })
     cb(null, media);
   });
@@ -110,18 +112,74 @@ const buildUser = async (obj, cb) => {
       zip_code: obj.zip_code,
       bank_details: obj.bank_details,
       subscription_status: obj.subscription_status,
-      genre_affinity: affinities
+      // genre_affinity: affinities
     });
-    user.save( (err) => {
-      if (err) {
-        cb(err, null);
-        return;
-      }
-      console.log('New User:', user.email);
-      users.push(user);
-      cb(null, user);
+
+    const mediaQty = (Math.floor((Math.random() * 50) + 51));
+
+    Media.aggregate([{$sample: {size: mediaQty }}, {$lookup: {from: 'genres', localField: 'genres', foreignField: '_id', as: 'genres'}}], (err, results) => {
+      if (err) { console.log(err); }
+      results.forEach(media => {
+
+        const viewLog = new ViewLog({
+          user: user,
+          media_src: media.media_src[0],
+          date: new Date(),
+          progress: (Math.random() > 0.05 ? 100 : Math.floor(Math.random() * 100))
+        })
+
+        user.view_logs.push(viewLog);
+
+        const mediaGenres = media.genres.map(genre => genre.name);
+
+        if (viewLog.progress === 100) {
+
+          const evaluation = evaluateMedia(mediaGenres, affinities)
+          
+          if (evaluation => 50 || evaluation < 30) {
+            const review = new MediaReview({
+              media: media,
+              user: user,
+              feedback: ((evaluation => 50) ? true : false)
+            });
+            (evaluation => 50) ? increaseAffinity(mediaGenres, affinities) : decreaseAffinity(mediaGenres, affinities);
+            user.media_reviews.push(review);
+          }
+        }
+      });
+
+      user.genre_affinity = affinities;
+
+      user.save( (err) => {
+        if (err) {
+          console.log('error in user:', err)
+          cb(err, null);
+          return;
+        }
+        users.push(user);
+        user.view_logs.forEach( log => {
+          log.save( (err) => {
+            if (err) {
+              console.log('error in viewlog:', err)
+              cb(err, null);
+              return;
+            }
+          });
+        });
+        user.media_reviews.forEach( review => {
+          review.save( (err) => {
+            if (err) {
+              console.log('error in mediareview:', err)
+              cb(err, null);
+              return;
+            }
+          });
+        });
+        // console.log('New User:', user.email);
+        cb(null, user);
+      });
     });
-  })
+  });
 }
 
 const createGenres = cb => {
@@ -162,5 +220,5 @@ async.series([
 ], (err, results) => {
   if (err) { console.log('FINAL ERR:', err); }
   else console.log('All saved');
-  mongo.disconnect();
+  setTimeout(mongo.disconnect, 5000);
 })
