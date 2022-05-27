@@ -101,6 +101,13 @@ const buildUser = async (obj, cb) => {
       };
     })
 
+    const randomGenres = genres.sort( () => 0.5 - Math.random()).slice(0,8).map( genre => genre.name);
+    const likedGenres = randomGenres.slice(0,4);
+    const dislikedGenres = randomGenres.slice(4);
+
+    increaseAffinity(likedGenres, affinities, 30);
+    decreaseAffinity(dislikedGenres, affinities, 30);
+
     const user = new User({
       email: obj.email,
       password: hashedPassword,
@@ -115,7 +122,7 @@ const buildUser = async (obj, cb) => {
       // genre_affinity: affinities
     });
 
-    const mediaQty = (Math.floor((Math.random() * 50) + 51));
+    const mediaQty = (Math.floor((Math.random() * 50) + 51)); // Sets a random amount [11-50] of mediaReviews to be generated per user
 
     Media.aggregate([{$sample: {size: mediaQty }}, {$lookup: {from: 'genres', localField: 'genres', foreignField: '_id', as: 'genres'}}], (err, results) => {
       if (err) { console.log(err); }
@@ -125,7 +132,7 @@ const buildUser = async (obj, cb) => {
           user: user,
           media_src: media.media_src[0],
           date: new Date(),
-          progress: (Math.random() > 0.05 ? 100 : Math.floor(Math.random() * 100))
+          progress: (Math.random() > 0.05 ? 100 : Math.floor(Math.random() * 90))
         })
 
         user.view_logs.push(viewLog);
@@ -136,13 +143,13 @@ const buildUser = async (obj, cb) => {
 
           const evaluation = evaluateMedia(mediaGenres, affinities)
           
-          if (evaluation => 50 || evaluation < 30) {
+          if (evaluation >= 50 || evaluation < 30) {
             const review = new MediaReview({
               media: media,
               user: user,
-              feedback: ((evaluation => 50) ? true : false)
+              feedback: ((evaluation >= 60) ? true : false)
             });
-            (evaluation => 50) ? increaseAffinity(mediaGenres, affinities) : decreaseAffinity(mediaGenres, affinities);
+            (evaluation >= 60) ? increaseAffinity(mediaGenres, affinities) : decreaseAffinity(mediaGenres, affinities);
             user.media_reviews.push(review);
           }
         }
