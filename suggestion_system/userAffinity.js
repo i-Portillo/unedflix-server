@@ -7,9 +7,7 @@ const User = require('../models/user')
 
 mongo.connect();
 
-const compareUsers = (user, other) => {
-
-  // console.log('Comparing', user.email, user.media_reviews.length, other.email, other.media_reviews.length)
+const compareUsers = (userReviews, other) => {
 
   const results = {
     user: other._id,
@@ -18,73 +16,60 @@ const compareUsers = (user, other) => {
 
   let affinity = 0;
   
-  user.media_reviews.forEach(userReview => {
+  userReviews.forEach(userReview => {
 
     const found = other.media_reviews.find(otherReview => otherReview.media.equals(userReview.media));
     if (found) {
       results.match += 1;
       if (userReview.feedback === found.feedback) affinity++;
+      results.feedback = found.feedback;
     }
   });
 
   if (results.match) results.affinity = affinity / results.match;
 
-  // console.log(results);
-
   return results;
 }
 
-const evaluateMedia = async media_id => {
-  // try {
-  //   const reviews = await MediaReview.find({media: media_id})
-  //   const users = [];
-  //   reviews.map( async review => {
-  //     await User.findOne({_id: review.user._id})
-  //     .exec( (err, result) => {
-  //       users.push(result)
-  //     })
-  //   })
-  //   console.log(users);
-  // } catch(err) {
-  //   console.log(err);
-  // }
-  // console.log('test')
+const evaluateMedia = async (mediaId, userReviews) => {
 
-  // async.waterfall([
-  //   (callback) => {
-  //     MediaReview.find({media: media_id}, (err, result) => {
-  //       callback(err, result);
-  //     })
-  //   },
-  //   (reviews, callback) => {
-  //     async.parallel(
-  //       () => reviews.map( review => {
-  //         User.findOne({_id: review.user._id}, 'email', (err, result) => {
-  //           callback(err, result);
-  //         })
-  //       })
-  //     )
-  //   }
-  // ], (err, data) => {
-  //   if (err) {
-  //     console.log(err);
-  //   }
-  //   console.log('result:', data);
-  // });
+  const affinityThreshold = 0.6;
 
-  MediaReview.findOne({media: media_id})
-  .populate({
-    path: 'user',
-    select: {'media_reviews': 1},
-    populate: {
-      path: 'media_reviews',
-      model: 'MediaReview'
-    }
-  })
-  .exec( (err, results) => {
-    if (err) { console.log(err); }
-    // console.log(results);
-  })
+  try {
+    const reviews = await MediaReview.find({media: mediaId})
+    .populate({
+      path: 'user',
+      select: {'media_reviews': 1},
+      populate: {
+        path: 'media_reviews',
+        model: 'MediaReview'
+      }
+    })
+
+    // For every review that media has compare the affinity with the user
+    let userAffinities = await Promise.all(
+      reviews.map( async review => {
+        const other = await User.findById(review.user)
+        .populate({
+          path: 'media_reviews'
+        });
+        return compareUsers(userReviews, other);
+      })
+    )
+
+    userAffinities = userAffinities.filter( userAffinity => userAffinity.affinity >= affinityThreshold)
+
+    if (userAffinities.length === 0) return 50;  // If not enough affinities => 50/50
+
+    const positiveFeedback = userAffinities.reduce( (prev, current) => {
+      return current.feedback ? prev + 1 : prev; // Counts the number of positive feedbacks
+    }, 0)
+
+    return 100 * positiveFeedback / userAffinities.length;
+
+  } catch(err) {
+    console.log(err);
+  }
 
 }
 
@@ -94,40 +79,17 @@ module.exports = { evaluateMedia, compareUsers };
 
 const debug = async () => {
 
-  // Me 6290ed845cce5b4c0d68a89c
-  // Simpsons movie 6290ed815cce5b4c0d689b3a
+  // Simpsons movie 
 
   try {
     const user = await User.findOne({})
     .populate({
       path: 'media_reviews'
     });
-
-    const reviews = await MediaReview.find({media: '6290ed815cce5b4c0d689b3a'})
-    .populate({
-      path: 'user',
-      select: {'media_reviews': 1},
-      populate: {
-        path: 'media_reviews',
-        model: 'MediaReview'
-      }
-    });
-
-    const affinityTable = await Promise.all(
-      reviews.map( async review => {
-        const other = await User.findById(review.user)
-        .populate({
-          path: 'media_reviews'
-        });
-        return compareUsers(user, other);
-      })
-    )
-
-    console.log(affinityTable);
+    console.log(await evaluateMedia({_id: '6295086043b62f47d0bf3479'}, user.media_reviews));
   } catch (err) {
     console.log(err);
-  }
-  
+  }  
 }
 
-debug();
+// debug();
