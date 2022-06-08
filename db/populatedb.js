@@ -102,11 +102,11 @@ const buildUser = async (obj, cb) => {
     })
 
     const randomGenres = genres.sort( () => 0.5 - Math.random()).slice(0,8).map( genre => genre.name);
-    const likedGenres = randomGenres.slice(0,4);
-    const dislikedGenres = randomGenres.slice(4);
+    const likedGenres = randomGenres.slice(0,5);
+    const dislikedGenres = randomGenres.slice(5);
 
     increaseAffinity(likedGenres, affinities, 30);
-    decreaseAffinity(dislikedGenres, affinities, 30);
+    decreaseAffinity(dislikedGenres, affinities, 10);
 
     const user = new User({
       email: obj.email,
@@ -122,7 +122,7 @@ const buildUser = async (obj, cb) => {
       // genre_affinity: affinities
     });
 
-    const mediaQty = (Math.floor((Math.random() * 50) + 51)); // Sets a random amount [11-50] of mediaReviews to be generated per user
+    const mediaQty = (Math.ceil((Math.random() * 10) + 10)); // Sets a random amount [11-20] of viewLogs to be generated per user
 
     Media.aggregate([{$sample: {size: mediaQty }}, {$lookup: {from: 'genres', localField: 'genres', foreignField: '_id', as: 'genres'}}], (err, results) => {
       if (err) { console.log(err); }
@@ -142,14 +142,16 @@ const buildUser = async (obj, cb) => {
         if (viewLog.progress === 100) {
 
           const evaluation = evaluateMedia(mediaGenres, affinities)
+
+          const likedThreshold = 55;
           
-          if (evaluation >= 50 || evaluation < 30) {
+          if (evaluation >= likedThreshold || evaluation < 40) {
             const review = new MediaReview({
               media: media,
               user: user,
-              feedback: ((evaluation >= 60) ? true : false)
+              feedback: ((evaluation >= likedThreshold) ? true : false)
             });
-            (evaluation >= 60) ? increaseAffinity(mediaGenres, affinities) : decreaseAffinity(mediaGenres, affinities);
+            (evaluation >= likedThreshold) ? increaseAffinity(mediaGenres, affinities) : decreaseAffinity(mediaGenres, affinities);
             user.media_reviews.push(review);
           }
         }
