@@ -30,6 +30,8 @@ app.use(express.static('public'));
 
 app.use(express.json())
 
+app.use('/api/user', userRoutes);
+
 app.get('/home', (req, res, next) => {
 
   Media.findOne({})
@@ -87,7 +89,7 @@ const getMovieData = async (genre) => {
   ])
 }
 
-app.get('/api/browse/genre/:genre', async (req, res, next) => {
+app.get('/api/browse/genre/:genre', auth, async (req, res, next) => {
 
   try {
 
