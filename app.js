@@ -1,16 +1,22 @@
-const express = require('express');
-const cors = require('cors');
-const logger = require('morgan');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import logger from 'morgan';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const mongo = require('./db/mongo');
-const Genre = require('./models/genre');
-const Media = require('./models/media');
-const MediaSrc = require('./models/mediaSrc');
-const User = require('./models/user');
+import mongo from './db/mongo.js';
+
+import Genre from './models/genre.js';
+import Media from './models/media.js';
+import MediaSrc from './models/mediaSrc.js';
+import User from './models/user.js';
+
+import auth from './middleware/auth.js';
+
+import userRoutes from './routes/users.js';
 
 //DEBUG
-const { arrangeByAffinity } = require('./suggestion_system/suggestion')
+import { arrangeByAffinity } from './suggestion_system/suggestion.js';
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
@@ -59,9 +65,9 @@ app.get('/api/media/:id', (req, res, next) => {
   });
 })
 
-app.post('/api/signin', (req, res, next) => {
-  console.log(req.body)
-})
+// app.post('/api/signin', (req, res, next) => {
+//   console.log(req.body)
+// })
 
 const getMovieData = async (genre) => {
   return await Media.aggregate([

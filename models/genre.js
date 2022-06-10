@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const GenreSchema = new Schema(
@@ -8,4 +8,4 @@ const GenreSchema = new Schema(
 );
 
 // Export model
-module.exports = mongoose.model('Genre', GenreSchema);
+export default mongoose.model('Genre', GenreSchema);

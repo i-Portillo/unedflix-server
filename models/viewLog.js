@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const ViewLogSchema = new Schema(
@@ -11,4 +11,4 @@ const ViewLogSchema = new Schema(
 );
 
 // Export model
-module.exports = mongoose.model('ViewLog', ViewLogSchema);
+export default mongoose.model('ViewLog', ViewLogSchema);

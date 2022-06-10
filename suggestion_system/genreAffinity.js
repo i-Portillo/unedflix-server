@@ -1,4 +1,4 @@
-const increaseAffinity = (likedGenres, userPreference, amount=5) => {
+export const increaseAffinity = (likedGenres, userPreference, amount=5) => {
   userPreference.forEach( genre => {
     if (likedGenres.includes(genre.genre)) {
       genre.value += amount;
@@ -7,7 +7,7 @@ const increaseAffinity = (likedGenres, userPreference, amount=5) => {
   normalizePreferences(userPreference);
 }
 
-const decreaseAffinity = (likedGenres, userPreference, amount=5) => {
+export const decreaseAffinity = (likedGenres, userPreference, amount=5) => {
   userPreference.forEach( genre => {
     if (likedGenres.includes(genre.genre)) {
       genre.value -= amount;
@@ -17,7 +17,7 @@ const decreaseAffinity = (likedGenres, userPreference, amount=5) => {
   normalizePreferences(userPreference);
 }
 
-const normalizePreferences = (userPreference) => {
+export const normalizePreferences = (userPreference) => {
   const r = (userPreference.length * 50) / (userPreference.reduce( (prev, obj) => prev + obj.value, 0));
 
   userPreference.map( genre => {
@@ -26,11 +26,11 @@ const normalizePreferences = (userPreference) => {
   })
 }
 
-const evaluateMedia = (mediaGenres, userPreference) => {
+export const evaluateMedia = (mediaGenres, userPreference) => {
 
   return userPreference
     .filter( genre => mediaGenres.includes(genre.genre))  // Find mediaGenres in userPreference
     .reduce( (prev, genre) => prev + genre.value, 0) / mediaGenres.length; // Add the affinity value and average
 }
 
-module.exports = { increaseAffinity, decreaseAffinity, evaluateMedia }
+// module.exports = { increaseAffinity, decreaseAffinity, evaluateMedia }

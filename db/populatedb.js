@@ -1,18 +1,22 @@
-const fs = require('fs');
-const path = require('path');
-const async = require('async');
-const bcrypt = require('bcrypt');
+import fs from 'fs';
+import async from 'async';
+import bcrypt from 'bcrypt';
 
-const mongo = require('./mongo');
-const { increaseAffinity, decreaseAffinity, evaluateMedia } = require('../suggestion_system/genreAffinity');
+import path from 'path';
+import * as url from 'url';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+
+import mongo from './mongo.js';
+import { increaseAffinity, decreaseAffinity, evaluateMedia } from '../suggestion_system/genreAffinity.js';
 
 // Models
-const Genre = require('../models/genre');
-const Media = require('../models/media');
-const User = require('../models/user');
-const MediaSrc = require('../models/mediaSrc');
-const ViewLog = require('../models/viewLog');
-const MediaReview = require('../models/mediaReview');
+import Genre from '../models/genre.js';
+import Media from '../models/media.js';
+import User from '../models/user.js';
+import MediaSrc from '../models/mediaSrc.js';
+import ViewLog from '../models/viewLog.js';
+import MediaReview from '../models/mediaReview.js';
 
 let genres = [];
 let medias = [];
@@ -122,7 +126,7 @@ const buildUser = async (obj, cb) => {
       // genre_affinity: affinities
     });
 
-    const mediaQty = (Math.ceil((Math.random() * 10) + 10)); // Sets a random amount [11-20] of viewLogs to be generated per user
+    const mediaQty = (Math.ceil((Math.random() * 20) + 10)); // Sets a random amount [11-30] of viewLogs to be generated per user
 
     Media.aggregate([{$sample: {size: mediaQty }}, {$lookup: {from: 'genres', localField: 'genres', foreignField: '_id', as: 'genres'}}], (err, results) => {
       if (err) { console.log(err); }

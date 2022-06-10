@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const MediaSrcSchema = new Schema(
@@ -9,4 +9,4 @@ const MediaSrcSchema = new Schema(
 );
 
 // Export model
-module.exports = mongoose.model('MediaSrc', MediaSrcSchema);
+export default mongoose.model('MediaSrc', MediaSrcSchema);
