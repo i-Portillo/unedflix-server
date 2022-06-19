@@ -3,3 +3,5 @@ node_modules
 db/sample_data
 public/images
 ignore.*
+public/media
+public/favicon.ico
