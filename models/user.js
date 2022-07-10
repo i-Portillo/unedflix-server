@@ -19,7 +19,11 @@ const UserSchema = new Schema(
       value: { type: Number }
     }],
     view_logs: [ { type: Schema.Types.ObjectId, ref: 'ViewLog' } ],
-    media_reviews: [ { type: Schema.Types.ObjectId, ref: 'MediaReview' } ]
+    media_reviews: [ { type: Schema.Types.ObjectId, ref: 'MediaReview' } ],
+    my_list: [ { 
+      media: { type: Schema.Types.ObjectId, ref: 'Media'},
+      added: { type: Date }
+    } ],
   }
 )
 
