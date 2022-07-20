@@ -1,6 +1,6 @@
 import fs from 'fs';
 import async from 'async';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 import path from 'path';
 import * as url from 'url';

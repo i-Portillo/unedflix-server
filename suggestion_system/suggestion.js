@@ -3,6 +3,8 @@ import * as userAf from './userAffinity.js';
 
 const evaluateMedia = async (user, media, similarityTable) => {
 
+  // console.log('evaluating', media);
+
   const genre = genreAf.evaluateMedia(media.genres.map(genre => genre.name), user.genre_affinity);
   const users = await userAf.evaluateMedia(media._id, user.media_reviews, similarityTable);
 
@@ -19,6 +21,26 @@ export const arrangeByAffinity = async (user, medias) => {
 
   await Promise.all(medias.map(async media => {
     media.affinity = await evaluateMedia(user, media, similarityTable);
+
+    const viewLog = user.view_logs.find( log => log.media_src.media.equals(media._id) );
+
+    // console.log(user.view_logs);
+
+    // if (viewLog) console.log(media.title, media.affinity);
+
+    if ( viewLog ) {
+      if (viewLog.progress === 100) media.affinity /= 2;
+    }
+    
+    const review = user.media_reviews.find( review => review.media.equals(media._id) );
+    if (review) {
+      console.log(media.title, review.feedback);
+      if (review.feedback === false) {
+        console.log('modifying affinity to 0')
+        media.affinity = 0;
+      }
+    }
+
   }));
 
   return medias.sort((a,b) => {

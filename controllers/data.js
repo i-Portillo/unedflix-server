@@ -4,6 +4,7 @@ import Media from "../models/media.js";
 import MediaReview from "../models/mediaReview.js";
 import MediaSrc from "../models/mediaSrc.js";
 import ViewLog from "../models/viewLog.js";
+import { decreaseAffinity, increaseAffinity } from "../suggestion_system/genreAffinity.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -93,7 +94,39 @@ export const putReview = async (req, res) => {
         if (err) { console.log(err) }
         console.log('Media Review saved.')
       })
+
+      const user = await User.findOneAndUpdate({ _id: req.user.id }, { $push: { media_reviews: newReview._id }}).select('genre_affinity');
+      const affinities = user.genre_affinity;
+      const media = await Media.findOne({ _id: req.body.media }).populate('genres').select('genres');
+      const genres = media.genres.map( genre => genre.name );
+      if (newReview.feedback === true ) {
+        increaseAffinity(genres, affinities);
+      } else {
+        decreaseAffinity(genres, affinities);
+      }
+      await User.updateOne({ _id: req.user.id }, { genre_affinity: affinities });
     }
+    res.status(200).send({ message: 'Review added', data: mediaReview });
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const deleteReview = async (req, res) => {
+  try {
+    // console.log('tryng to delete:', req.body.media, 'by', req.user.id)
+    const deletedReview = await MediaReview.findOneAndRemove({ user: req.user.id, media: req.query.media });
+    const user = await User.findOne({ _id: req.user.id }).select('genre_affinity');
+    const affinities = user.genre_affinity;
+    const media = await Media.findOne({ _id: req.query.media }).populate('genres').select('genres');
+    const genres = media.genres.map( genre => genre.name );
+    if (deletedReview.feedback === true ) {
+      decreaseAffinity(genres, affinities);
+    } else {
+      increaseAffinity(genres, affinities);
+    }
+    await User.updateOne({ _id: req.user.id }, { genre_affinity: affinities, $pull: { media_reviews: deletedReview._id }});
+    res.status(200).send({ message: 'Review deleted', data: deletedReview });
   } catch(err) {
     console.log(err);
   }
@@ -132,7 +165,8 @@ export const putMediaInList = async (req, res) => {
           added: Date.now(),
         }
       }}
-    )
+    );
+    res.status(204).send();
   } catch(err) {
     console.log(err);
   }
@@ -146,6 +180,7 @@ export const deleteMediaFromList = async (req, res) => {
         my_list: { media: req.params.id }
       }
     })
+    res.status(204).send();
   } catch(err) {
     console.log(err);
   }

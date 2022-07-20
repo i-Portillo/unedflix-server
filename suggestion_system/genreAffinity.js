@@ -1,15 +1,15 @@
-export const increaseAffinity = (likedGenres, userPreference, amount=5) => {
+export const increaseAffinity = (mediaGenres, userPreference, amount=5) => {
   userPreference.forEach( genre => {
-    if (likedGenres.includes(genre.genre)) {
+    if (mediaGenres.includes(genre.genre)) {
       genre.value += amount;
     }
   })
   normalizePreferences(userPreference);
 }
 
-export const decreaseAffinity = (likedGenres, userPreference, amount=5) => {
+export const decreaseAffinity = (mediaGenres, userPreference, amount=5) => {
   userPreference.forEach( genre => {
-    if (likedGenres.includes(genre.genre)) {
+    if (mediaGenres.includes(genre.genre)) {
       genre.value -= amount;
       if (genre.value < 1) genre.value = 1;
     }
