@@ -5,6 +5,7 @@ import MediaReview from "../models/mediaReview.js";
 import MediaSrc from "../models/mediaSrc.js";
 import ViewLog from "../models/viewLog.js";
 import { decreaseAffinity, increaseAffinity } from "../suggestion_system/genreAffinity.js";
+import e from "express";
 
 export const getUser = async (req, res) => {
   try {
@@ -185,8 +186,19 @@ export const deleteMediaFromList = async (req, res) => {
   }
 }
 
+export const getViewLog = async (req, res) => {
+  console.log(req.query)
+  const viewLog = await ViewLog.findOne({ user: req.user.id, media_src: req.query.mediaSrc });
+  if (viewLog) {
+    console.log('Viewlog found');
+    res.send({ message: 'viewLog found', data: viewLog });
+  } else {
+    console.log('Viewlog not found');
+    res.send({ message: 'viewLog not found' });
+  }
+}
+
 export const putViewLog = async (req, res) => {
-  console.log('tryng to put viewLog');
   try {
     const existentViewLog = await ViewLog.findOne({ user: req.user.id, media_src: req.body.mediaSrc });
     if (existentViewLog) {  // Already exists, then update
