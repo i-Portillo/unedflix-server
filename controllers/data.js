@@ -67,7 +67,6 @@ export const getReview = async (req, res) => {
   try {
     const mediaReview = await MediaReview.findOne({ user: req.user.id, media: req.query.media });
     if (mediaReview) {
-      console.log(mediaReview.feedback);
       res.send({ found: true, feedback: mediaReview.feedback});
     } else {
       res.send({ found: false });
@@ -181,6 +180,36 @@ export const deleteMediaFromList = async (req, res) => {
       }
     })
     res.status(204).send();
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const putViewLog = async (req, res) => {
+  console.log('tryng to put viewLog');
+  try {
+    const existentViewLog = await ViewLog.findOne({ user: req.user.id, media_src: req.body.mediaSrc });
+    if (existentViewLog) {  // Already exists, then update
+      existentViewLog.progress = req.body.progress;
+      existentViewLog.date = Date.now();
+      existentViewLog.save( (err, viewLog) => {
+        if (err) res.send({ message: `ViewLog not saved: ${err}`, data: err});
+        res.send({ message: 'ViewLog updated.', data: viewLog });
+      });
+    } else {
+      const newViewLog = new ViewLog({
+        user: req.user.id,
+        media_src: req.body.mediaSrc,
+        date: Date.now(),
+        progress: req.body.progress,
+      });
+      newViewLog.save( (err, viewLog) => {
+        if (err) res.send({ message: `ViewLog not saved: ${err}`, data: err});
+        console.log('ViewLog created.')
+        res.send({ message: 'ViewLog created.', data: viewLog });
+      });
+      await User.findOneAndUpdate({ _id: req.user.id }, { $push: { view_logs: newViewLog._id }})
+    }
   } catch(err) {
     console.log(err);
   }
