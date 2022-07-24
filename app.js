@@ -16,6 +16,7 @@ import Genre from './models/genre.js';
 import Media from './models/media.js';
 import MediaSrc from './models/mediaSrc.js';
 import User from './models/user.js';
+import ViewLog from './models/viewLog.js';
 
 import authRoutes from './routes/auth.js';
 import dataRoutes from './routes/data.js';
@@ -62,7 +63,7 @@ const loggedIn = (req, res, next) => {
   } else {
     console.log('Not authenticated');
     res.auth = false;
-    res.status(403);
+    res.status(401);
     res.send('Not authorized in loggedIn()')
   }
 }
@@ -106,7 +107,15 @@ app.get('/api/medias/genre/:genre', loggedIn, async (req, res, next) => {
   try {
 
     const user = await User.findOne({ _id: req.user.id })
-    .populate('media_reviews');
+    .populate('media_reviews')
+    .populate({
+      path: 'view_logs',
+      populate: {
+        path: 'media_src',
+        select: { media: 1 },
+        model: 'MediaSrc'
+      }
+    });
 
     let media = await getMovieData(req.params.genre);
     media = await arrangeByAffinity(user, media);
