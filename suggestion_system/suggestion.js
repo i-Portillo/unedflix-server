@@ -34,9 +34,7 @@ export const arrangeByAffinity = async (user, medias) => {
     
     const review = user.media_reviews.find( review => review.media.equals(media._id) );
     if (review) {
-      console.log(media.title, review.feedback);
       if (review.feedback === false) {
-        console.log('modifying affinity to 0')
         media.affinity = 0;
       }
     }
