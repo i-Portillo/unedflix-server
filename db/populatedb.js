@@ -6,7 +6,6 @@ import path from 'path';
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-
 import mongo from './mongo.js';
 import { increaseAffinity, decreaseAffinity, evaluateMedia } from '../suggestion_system/genreAffinity.js';
 
@@ -40,7 +39,7 @@ const buildGenre = (obj, cb) => {
   });
 }
 
-const buildMedia = async (obj, cb) => {
+const buildMovie = async (obj, cb) => {
   
   const genres = await Promise.all( obj.genres.map( async (genreName) => {
     const foundGenre = await Genre.findOne({name: genreName})
@@ -53,13 +52,10 @@ const buildMedia = async (obj, cb) => {
     genres: genres,
     overview: obj.overview,
     type: 'Movie',
-    runtime: obj.runtime,
     release_date: obj.release_date,
-    rating: obj.rating,
     cast: obj.cast,
     director: obj.director,
     production: obj.production,
-    imdb_id: obj.imdb_id,
     poster: `/images/movie_posters/${obj.media_id}.jpg`,
     updated: obj.release_date,
   })
@@ -69,24 +65,84 @@ const buildMedia = async (obj, cb) => {
     src: `/media/video.mp4`
   })
 
-  media.media_src = [ mediaSrc ];
+  media.media_src = [ [mediaSrc] ];
 
   media.save( (err) => {
     if (err) {
       cb(err, null);
       return;
     }
-    // console.log('New Media:', media.title);
     medias.push(media);
     mediaSrc.save( (err) => {
       if (err) {
         cb(err, null);
         return;
       }
-      // console.log('Added MediaSrc');
     })
     cb(null, media);
   });
+};
+
+const buildShow = async (obj, cb) => {
+
+  const genres = await Promise.all( obj.genres.map( async (genreName) => {
+    const foundGenre = await Genre.findOne({name: genreName})
+    return foundGenre;
+  }))
+
+  const media = new Media({
+    media_id: obj.media_id,
+    title: obj.title,
+    genres: genres,
+    overview: obj.overview,
+    type: 'Show',
+    release_date: obj.release_date,
+    cast: obj.cast,
+    director: obj.director,
+    production: obj.production,
+    poster: `/images/show_posters/${obj.media_id}.jpg`,
+    updated: obj.updated,
+  })
+
+  const seasons = [];
+  for (const season of obj.seasons) {
+    const episodes = [];
+    for (const episode of season) {
+      const episodeSrc = new MediaSrc({
+        media: media,
+        title: episode,
+        src: `/media/video.mp4`,
+      })
+      episodeSrc.save( (err) => {
+        if (err) {
+          cb(err, null);
+          return;
+        }
+      })
+      episodes.push(episodeSrc);
+    }
+    seasons.push(episodes);
+  }
+
+  if(media.media_id === "66732") console.log(seasons);
+
+  media.media_src = seasons;
+
+  media.save( (err) => {
+    if (err) {
+      cb(err, null);
+      return;
+    }
+    medias.push(media);
+    // mediaSrc.save( (err) => {
+    //   if (err) {
+    //     cb(err, null);
+    //     return;
+    //   }
+    // })
+    cb(null, media);
+  });
+
 };
 
 const buildUser = async (obj, cb) => {
@@ -134,7 +190,7 @@ const buildUser = async (obj, cb) => {
 
         const viewLog = new ViewLog({
           user: user,
-          media_src: media.media_src[0],
+          media_src: media.media_src[0][0],
           date: new Date(),
           progress: (Math.random() > 0.05 ? 100 : Math.floor(Math.random() * 90))
         })
@@ -205,15 +261,25 @@ const createGenres = cb => {
   }), cb);
 };
 
-const createMedias = cb => {
+const createMovies = cb => {
   const raw = fs.readFileSync(path.resolve(__dirname, './sample_data/movie-data.json'));
   const mediaSamples = JSON.parse(raw);
   async.series( mediaSamples.map( obj => {
     return (callback) => {
-      buildMedia(obj, callback)
+      buildMovie(obj, callback)
     };
   }), cb);
 };
+
+const createShows = cb => {
+  const raw = fs.readFileSync(path.resolve(__dirname, './sample_data/show-data.json'));
+  const mediaSamples = JSON.parse(raw);
+  async.series( mediaSamples.map( obj => {
+    return (callback) => {
+      buildShow(obj, callback)
+    };
+  }), cb);
+}
 
 const createUsers = cb => {
   const raw = fs.readFileSync(path.resolve(__dirname, './sample_data/user-data.json'));
@@ -228,7 +294,8 @@ const createUsers = cb => {
 
 async.series([
   createGenres,
-  createMedias,
+  createMovies,
+  createShows,
   createUsers,
 ], (err, results) => {
   if (err) { console.log('FINAL ERR:', err); }

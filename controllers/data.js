@@ -191,10 +191,10 @@ export const getViewLog = async (req, res) => {
   const viewLog = await ViewLog.findOne({ user: req.user.id, media_src: req.query.mediaSrc });
   if (viewLog) {
     console.log('Viewlog found');
-    res.send({ message: 'viewLog found', data: viewLog });
+    res.send({ message: 'viewLog found', data: viewLog, found: true });
   } else {
     console.log('Viewlog not found');
-    res.send({ message: 'viewLog not found' });
+    res.send({ message: 'viewLog not found', found: false });
   }
 }
 

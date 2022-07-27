@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const MediaSrcSchema = new Schema(
   {
     media: { type: Schema.Types.ObjectId, ref: 'Media'},
-    src: { type: String }
+    title: { type: String },
+    src: { type: String },
   }
 );
 
