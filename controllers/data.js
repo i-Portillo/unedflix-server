@@ -46,7 +46,7 @@ export const getUserList = async (req, res) => {
       return new Date(b.added) - new Date(a.added);
     });
     const medias = await Promise.all( sortedList.map( async media => {
-      const foundMedia = await Media.findOne({ _id: media.media }, 'title poster');
+      const foundMedia = await Media.findOne({ _id: media.media }, 'title poster type');
       return foundMedia;
     }));
     res.send(medias);

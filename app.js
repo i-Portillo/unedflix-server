@@ -87,7 +87,8 @@ const getMovieData = async (genre) => {
       $project: {
         "title": 1,
         "poster": 1,
-        "genres": 1
+        "genres": 1,
+        "type": 1,
       }
     }
   ])
