@@ -55,6 +55,24 @@ export const getUserList = async (req, res) => {
   }
 }
 
+export const getQuery = async (req, res) => {
+  // const query = req.params.query;
+  console.log(req.query.searchQuery);
+  const query = req.query.searchQuery;
+  try {
+    const medias = await Media.find({
+      $or: [
+        { 'title': { "$regex": query, "$options": "i" }},
+        { 'cast': { "$regex": query, "$options": "i"}},
+        { 'director': { "$regex": query, "$options": "i"}},
+      ]
+    })
+    res.send(medias);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const getGenres = async (req, res) => {
   try {
     const genres = await Genre.find();
