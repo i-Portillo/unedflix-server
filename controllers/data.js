@@ -55,6 +55,15 @@ export const getUserList = async (req, res) => {
   }
 }
 
+export const getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.send(users);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const getQuery = async (req, res) => {
   // const query = req.params.query;
   console.log(req.query.searchQuery);
