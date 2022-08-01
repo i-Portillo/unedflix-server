@@ -7,6 +7,15 @@ import ViewLog from "../models/viewLog.js";
 import { decreaseAffinity, increaseAffinity } from "../suggestion_system/genreAffinity.js";
 import e from "express";
 
+export const getMedias = async (req, res) => {
+  try {
+    const medias = await Media.find();
+    res.status(200).send(medias);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const getUser = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user.id })
@@ -33,7 +42,7 @@ export const getUserGenres = async (req, res) => {
     const genres = [...user.genre_affinity].sort( (a,b) => {
       return b.value - a.value;
     })
-    res.send(genres);
+    res.status(200).send(genres);
   } catch(err) {
     console.log(err);
   }
@@ -49,7 +58,7 @@ export const getUserList = async (req, res) => {
       const foundMedia = await Media.findOne({ _id: media.media }, 'title poster type');
       return foundMedia;
     }));
-    res.send(medias);
+    res.status(200).send(medias);
   } catch(err) {
     console.log(err);
   }
@@ -58,7 +67,7 @@ export const getUserList = async (req, res) => {
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.send(users);
+    res.status(200).send(users);
   } catch(err) {
     console.log(err);
   }
@@ -76,7 +85,7 @@ export const getQuery = async (req, res) => {
         { 'director': { "$regex": query, "$options": "i"}},
       ]
     })
-    res.send(medias);
+    res.status(200).send(medias);
   } catch(err) {
     console.log(err);
   }
@@ -85,7 +94,7 @@ export const getQuery = async (req, res) => {
 export const getGenres = async (req, res) => {
   try {
     const genres = await Genre.find();
-    res.send(genres);
+    res.status(200).send(genres);
   } catch(err) {
     console.log(err);
   }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteMediaFromList, deleteReview, getGenres, getMediaInList, getMediaSrc, getQuery, getReview, getUser, getUserGenres, getUserList, getUserRole, getUsers, getViewLog, putMediaInList, putReview, putViewLog } from '../controllers/data.js';
+import { deleteMediaFromList, deleteReview, getMedias, getGenres, getMediaInList, getMediaSrc, getQuery, getReview, getUser, getUserGenres, getUserList, getUserRole, getUsers, getViewLog, putMediaInList, putReview, putViewLog } from '../controllers/data.js';
 
 export const router = express.Router();
 
@@ -9,6 +9,8 @@ router.get('/user/genres', getUserGenres);
 router.get('/user/list', getUserList);
 
 router.get('/users', getUsers);
+
+router.get('/medias', getMedias);
 
 router.get('/medias/search/', getQuery);
 
