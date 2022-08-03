@@ -64,6 +64,24 @@ export const getUserList = async (req, res) => {
   }
 }
 
+export const getUserKeepWatching = async (req, res) => {
+  try {
+    const viewLogs = await ViewLog.find({ user: req.user.id, progress: { $lt: 100 } })
+    .populate({
+      path: 'media_src',
+      populate: {
+        path: 'media',
+        model: 'Media',
+        select: { 'title': 1, 'poster': 1, 'type': 1 }
+      }
+    })
+    const medias = [...new Set(viewLogs.map( viewLog => viewLog.media_src.media ))];
+    res.status(200).send(medias);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find();
