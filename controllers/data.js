@@ -195,14 +195,38 @@ export const getMediaSrc = async (req, res) => {
   }
 }
 
+export const getMediaSrcsAndProgress = async (req, res) => {
+  try {
+    const media = await Media.findOne({ _id: req.params.id }, 'media_src')
+    .populate({
+      path: 'media_src',
+      model: 'MediaSrc',
+    });
+    const mediaSrcs = media.media_src;
+    const seasonsProgress = []
+    for(const season of mediaSrcs) {
+      const episodeProgressList = await Promise.all(season.map( async episode => {
+        const viewLog = await ViewLog.findOne({ media_src: episode._id, user: req.user.id });
+        if (viewLog) return viewLog.progress;
+        return 0;
+      }))
+      seasonsProgress.push(episodeProgressList);
+    }
+    const response = { mediaSrcs, seasonsProgress };
+    res.status(200).send(response);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const getMediaInList = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user.id })
-    .select('my_list');
+    .select('my_list'); 
     if (user.my_list.filter( item => item.media.equals(req.params.id) ).length >= 1 ) {
-      res.send(true);
+      res.status(200).send(true);
     } else {
-      res.send(false);
+      res.status(200).send(false);
     }
   } catch(err) {
     console.log(err);
@@ -241,14 +265,11 @@ export const deleteMediaFromList = async (req, res) => {
 }
 
 export const getViewLog = async (req, res) => {
-  console.log(req.query)
   const viewLog = await ViewLog.findOne({ user: req.user.id, media_src: req.query.mediaSrc });
   if (viewLog) {
-    console.log('Viewlog found');
-    res.send({ message: 'viewLog found', data: viewLog, found: true });
+    res.status(200).send({ message: 'viewLog found', data: viewLog, found: true });
   } else {
-    console.log('Viewlog not found');
-    res.send({ message: 'viewLog not found', found: false });
+    res.status(204).send({ message: 'viewLog not found', found: false });
   }
 }
 
