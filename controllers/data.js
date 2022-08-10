@@ -64,6 +64,26 @@ export const getUserList = async (req, res) => {
   }
 }
 
+export const getUserReviews = async (req, res) => {
+  try {
+    const reviews = await MediaReview.find({ user: req.params.user })
+    .populate('media');
+    res.status(200).send(reviews);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const getUserViewLogs = async (req, res) => {
+  try {
+    const viewLogs = await ViewLog.find({ user: req.params.user })
+    .populate('media_src');
+    res.status(200).send(viewLogs);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const getUserKeepWatching = async (req, res) => {
   try {
     const viewLogs = await ViewLog.find({ user: req.user.id, progress: { $lt: 100 } })

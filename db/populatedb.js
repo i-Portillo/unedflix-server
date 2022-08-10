@@ -62,6 +62,7 @@ const buildMovie = async (obj, cb) => {
 
   const mediaSrc = new MediaSrc({
     media: media,
+    title: media.title,
     src: `/media/video.mp4`
   })
 
