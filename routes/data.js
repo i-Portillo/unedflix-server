@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteMediaFromList, deleteReview, getMedias, getGenres, getMediaInList, getMediaSrc, getQuery, getReview, getUser, getUserGenres, getUserList, getUserReviews, getUserKeepWatching, getUserRole, getUsers, getViewLog, putMediaInList, putReview, putViewLog, getMediaSrcsAndProgress, getUserViewLogs } from '../controllers/data.js';
+import { deleteMediaFromList, deleteReview, getMedias, getGenres, getMediaInList, getMediaSrc, getQuery, getReview, getUser, getUserGenres, getUserList, getUserReviews, getUserKeepWatching, getUserRole, getUsers, getViewLog, putMediaInList, putReview, putViewLog, getMediaSrcsAndProgress, getUserViewLogs, putUserData, deleteUser } from '../controllers/data.js';
 
 export const router = express.Router();
 
@@ -10,6 +10,10 @@ router.get('/user/list', getUserList);
 router.get('/user/:user/reviews', getUserReviews);
 router.get('/user/:user/viewlogs', getUserViewLogs);
 router.get('/user/keepwatching', getUserKeepWatching);
+
+router.put('/user/:user', putUserData);
+
+router.delete('/user/:user', deleteUser);
 
 router.get('/users', getUsers);
 

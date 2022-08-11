@@ -102,6 +102,25 @@ export const getUserKeepWatching = async (req, res) => {
   }
 }
 
+export const putUserData = async (req, res) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate({ _id: req.params.user }, req.body.data );
+    res.status(200).send(updatedUser);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const deleteUser = async (req, res) => {
+  try {
+    const deletedUser = await User.findOneAndDelete({ _id: req.params.user }, req.body.data);
+    // TODO: Remove everything where this user appears (viewLogs and mediaReviews?)
+    res.status(200).send(deletedUser);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find();
