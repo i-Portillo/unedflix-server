@@ -132,8 +132,6 @@ export const getUsers = async (req, res) => {
 }
 
 export const getQuery = async (req, res) => {
-  // const query = req.params.query;
-  console.log(req.query.searchQuery);
   const query = req.query.searchQuery;
   try {
     const medias = await Media.find({

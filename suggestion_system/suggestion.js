@@ -24,10 +24,6 @@ export const arrangeByAffinity = async (user, medias) => {
 
     const viewLog = user.view_logs.find( log => log.media_src.media.equals(media._id) );
 
-    // console.log(user.view_logs);
-
-    // if (viewLog) console.log(media.title, media.affinity);
-
     if ( viewLog ) {
       if (viewLog.progress === 100) media.affinity /= 2;
     }

@@ -125,8 +125,6 @@ const buildShow = async (obj, cb) => {
     seasons.push(episodes);
   }
 
-  if(media.media_id === "66732") console.log(seasons);
-
   media.media_src = seasons;
 
   media.save( (err) => {
@@ -245,7 +243,6 @@ const buildUser = async (obj, cb) => {
             }
           });
         });
-        // console.log('New User:', user.email);
         cb(null, user);
       });
     });
