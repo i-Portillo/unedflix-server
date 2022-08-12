@@ -129,7 +129,7 @@ app.get('/api/medias/genre/:genre', loggedIn, async (req, res, next) => {
 
 app.get('/api/private', loggedIn, (req, res, next) => {
   console.log('Accessing private route');
-  res.status(200).send('User authenticated');
+  res.status(200).send({ message: 'User authenticated', user: req.user });
 })
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

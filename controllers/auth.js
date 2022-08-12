@@ -8,7 +8,7 @@ export const signin = (req, res) => {
     else {
       req.logIn(user, (err) => {
         if (err) { console.log(err) };
-        res.status(200).json({ message: "User authenticated" });
+        res.status(200).json({ message: "User authenticated", data: user });
       })
     }
     console.log('end authenticate')

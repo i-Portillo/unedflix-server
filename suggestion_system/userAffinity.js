@@ -1,10 +1,10 @@
 import MediaReview from '../models/mediaReview.js'
 
-const getUserSimilarity = (userReviews, otherReviews) => {
+const getUserSimilarity = (userReviews, otherReviews=[]) => {
 
   let reviewedByBoth = 0;
   let sameFeedback = 0;
-
+  
   userReviews.forEach(userReview => {
     const found = otherReviews.find(otherReview => otherReview.media.equals(userReview.media));
     if (found) {
@@ -37,8 +37,8 @@ export const evaluateMedia = async (mediaId, userReviews, similarityTable) => {
     });
 
     const otherUsers = reviews.map( review => {
-      const otherUser = review.user;
-      otherUser.feedback = review.feedback;
+      const user = (review.user)?.toJSON();
+      let otherUser = { ...user, feedback: review.feedback }
       return otherUser;
     });
 

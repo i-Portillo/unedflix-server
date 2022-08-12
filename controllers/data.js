@@ -114,7 +114,8 @@ export const putUserData = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const deletedUser = await User.findOneAndDelete({ _id: req.params.user }, req.body.data);
-    // TODO: Remove everything where this user appears (viewLogs and mediaReviews?)
+    await ViewLog.deleteMany({ user: deletedUser._id });
+    await MediaReview.deleteMany({ user: deletedUser._id });
     res.status(200).send(deletedUser);
   } catch(err) {
     console.log(err);
