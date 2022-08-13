@@ -13,7 +13,7 @@ router.get('/user/keepwatching', getUserKeepWatching);
 
 router.post('/user', postUser);
 
-router.put('/user/:user', putUserData);
+router.put('/user', putUserData);
 
 router.delete('/user/:user', deleteUser);
 

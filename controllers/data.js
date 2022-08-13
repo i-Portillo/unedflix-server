@@ -151,7 +151,8 @@ export const postUser = async (req, res) => {
 
 export const putUserData = async (req, res) => {
   try {
-    const updatedUser = await User.findOneAndUpdate({ _id: req.params.user }, req.body.data );
+    const user = req.body.user ? req.body.user : req.user.id;
+    const updatedUser = await User.findOneAndUpdate({ _id: user }, req.body.data );
     res.status(200).send(updatedUser);
   } catch(err) {
     console.log(err);
