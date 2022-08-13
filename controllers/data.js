@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 import User from "../models/user.js";
 import Genre from "../models/genre.js";
 import Media from "../models/media.js";
@@ -5,7 +7,6 @@ import MediaReview from "../models/mediaReview.js";
 import MediaSrc from "../models/mediaSrc.js";
 import ViewLog from "../models/viewLog.js";
 import { decreaseAffinity, increaseAffinity } from "../suggestion_system/genreAffinity.js";
-import e from "express";
 
 export const getMedias = async (req, res) => {
   try {
@@ -97,6 +98,52 @@ export const getUserKeepWatching = async (req, res) => {
     })
     const medias = [...new Set(viewLogs.map( viewLog => viewLog.media_src.media ))];
     res.status(200).send(medias);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const postUser = async (req, res) => {
+  try {
+    const hashedPassword = await bcrypt.hash(req.body.data.password, 10);
+
+    const genres = await Genre.find();
+
+    const affinities = genres.map( genre => {
+      return {
+        genre: genre.name,
+        value: 50
+      };
+    })
+
+    const createdUser = new User({
+      email: req.body.data.email,
+      password: hashedPassword,
+      role: req.body.data.role,
+      name: req.body.data.name,
+      family_name: req.body.data.family_name,
+      address: req.body.data.address,
+      city: req.body.data.city,
+      state: req.body.data.state,
+      zip_code: req.body.data.zip_code,
+      bank_details: req.body.data.bank_details,
+      subscription_status: req.body.data.subscription_status,
+      genre_affinity: affinities,
+      view_logs: [],
+      media_reviews: [],
+      my_list: [],
+    });
+
+    createdUser.save( (err) => {
+      if (err) {
+        console.log('error in user:', err)
+        cb(err, null);
+        return;
+      }
+    });
+
+    res.status(200).send(createdUser);
+
   } catch(err) {
     console.log(err);
   }
