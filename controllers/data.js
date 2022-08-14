@@ -10,7 +10,12 @@ import { decreaseAffinity, increaseAffinity } from "../suggestion_system/genreAf
 
 export const getMedias = async (req, res) => {
   try {
-    const medias = await Media.find();
+    const medias = await Media.find()
+    .populate('genres')
+    .populate({
+      path: 'media_src',
+      model: 'MediaSrc',
+    });
     res.status(200).send(medias);
   } catch(err) {
     console.log(err);
