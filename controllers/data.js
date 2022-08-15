@@ -53,6 +53,31 @@ export const putMediaData = async (req, res) => {
   }
 }
 
+export const deleteMedia = async (req, res) => {
+  try {
+    const deletedMedia = await Media.findOneAndDelete({ _id: req.params.media });
+    await User.updateMany({ 'my_list.media' : req.params.media }, { $pull: { 'my_list': { media: req.params.media} }}); // Remove from user lists
+    const mediaReviews = await MediaReview.find({ media: deletedMedia._id });
+    await Promise.all(mediaReviews.map( async review => { 
+      return await User.findOneAndUpdate({ _id: review.user }, { $pull: { media_reviews: review._id }}); // Remove all references to reviews in users
+    }))
+    const deletedReviews = await MediaReview.deleteMany({ media: deletedMedia._id }); // Remove all reviews
+    const mediaSrcs = await MediaSrc.find({ media: req.params.media });
+    const deletedSrcs = await MediaSrc.deleteMany({ media: deletedMedia._id }); // Remove all srcs
+    await Promise.all(mediaSrcs.map( async src => {
+      const viewLogs = await ViewLog.find({ media_src: src._id });
+      await Promise.all( viewLogs.map( async log => {
+        return await User.findOneAndUpdate({ _id: log.user }, { $pull: { view_logs: log._id }});  // Remove all references to view logs in users
+      }))
+      await ViewLog.deleteMany({ media_src: src._id }); // Remove all view logs
+    }))
+    
+    res.status(200).send({ deletedMedia, deletedReviews, deletedSrcs });
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const getUser = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user.id })
@@ -197,7 +222,7 @@ export const putUserData = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const deletedUser = await User.findOneAndDelete({ _id: req.params.user }, req.body.data);
+    const deletedUser = await User.findOneAndDelete({ _id: req.params.user });
     await ViewLog.deleteMany({ user: deletedUser._id });
     await MediaReview.deleteMany({ user: deletedUser._id });
     res.status(200).send(deletedUser);
