@@ -24,11 +24,9 @@ export const getMedias = async (req, res) => {
 
 export const putMediaData = async (req, res) => {
   try {
-    // TODO: Update genres
 
     const updatedMediaSrc = await Promise.all( req.body.data.media_src.map( async season => {
       const episodes = await Promise.all( season.map( async episode => {
-        console.log(episode)
         if (episode._id) {
           let episodeSrc = await MediaSrc.findOneAndUpdate({ _id: episode._id }, { title: episode.title, src: episode.src });
           return episodeSrc;
@@ -45,7 +43,7 @@ export const putMediaData = async (req, res) => {
       return episodes;
     }))
 
-    const updatedMedia = await Media.findOneAndUpdate({ _id: req.body.mediaId }, { ...req.body.data, media_src: updatedMediaSrc } );
+    const updatedMedia = await Media.findOneAndUpdate({ _id: req.body.mediaId }, { ...req.body.data, media_src: updatedMediaSrc, genres: req.body.data.genres.map(genre => genre._id) });
 
     res.status(200).send(updatedMedia);
   } catch(err) {
