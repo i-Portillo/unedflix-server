@@ -51,6 +51,51 @@ export const putMediaData = async (req, res) => {
   }
 }
 
+export const postMedia = async (req, res) => {
+  try {
+    const mediaData = req.body.data;
+    
+    const newMedia = new Media({
+      media_id: mediaData.media_id,
+      title: mediaData.title,
+      genres: mediaData.genres,
+      overview: mediaData.overview,
+      type: mediaData.type,
+      release_date: mediaData.release_date,
+      cast: mediaData.cast,
+      director: mediaData.director,
+      production: mediaData.production,
+      poster: mediaData.poster,
+      updated: mediaData.updated,
+    })
+
+    const mediaSrcs = await Promise.all(mediaData.media_src.map( async season => {
+      const episodes = await Promise.all(season.map( async episode => {
+        const newSrc = new MediaSrc({
+          title: episode.title,
+          src: episode.src,
+          media: newMedia._id,
+        })
+
+        const savedSrc = await newSrc.save();
+        console.log('savedSrc', savedSrc);
+        return savedSrc;
+      }))
+      return episodes;
+    }))
+
+    console.log('mediaSrcs:', mediaSrcs);
+
+    newMedia.media_src = mediaSrcs;
+
+    await newMedia.save();
+
+    res.status(200).send(req.body.data);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const deleteMedia = async (req, res) => {
   try {
     const deletedMedia = await Media.findOneAndDelete({ _id: req.params.media });
