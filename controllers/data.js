@@ -263,6 +263,18 @@ export const putUserData = async (req, res) => {
   }
 }
 
+export const putUserPassword = async (req, res) => {
+  try {
+    const user = req.user.id;
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const updatedUser = await User.findOneAndUpdate({ _id: user }, { password: hashedPassword });
+    console.log(updatedUser);
+    res.status(200).send(updatedUser);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const deleteUser = async (req, res) => {
   try {
     const deletedUser = await User.findOneAndDelete({ _id: req.params.user });
