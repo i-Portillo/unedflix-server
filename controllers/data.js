@@ -491,3 +491,22 @@ export const putViewLog = async (req, res) => {
     console.log(err);
   }
 }
+
+export const getMediaReviewData = async (req, res) => {
+  try {
+    const likedCount = await MediaReview.count({ media : req.params.mediaId, feedback: true });
+    const dislikedCount = await MediaReview.count({ media : req.params.mediaId, feedback: false });
+    res.status(200).send({ liked: likedCount, disliked: dislikedCount });
+  } catch(err) {
+    console.log(err);
+  }
+}
+  
+export const getListedData = async (req, res) => {
+  try {
+    const listedCount = await User.count({ 'my_list.media': req.params.mediaId })
+    res.status(200).send({ count: listedCount });
+  } catch(err) {
+    console.log(err);
+  }
+}
