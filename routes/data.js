@@ -20,6 +20,10 @@ router.delete('/user/:user', deleteUser);
 
 router.get('/users', getUsers);
 
+router.get('/media/review', getReview);
+router.put('/media/review', putReview);
+router.delete('/media/review', deleteReview);
+
 router.put('/media', putMediaData);
 router.post('/media', postMedia);
 
@@ -32,10 +36,6 @@ router.get('/medias/search/', getQuery);
 router.get('/genres', getGenres);
 
 router.get('/mediaSrc/:id', getMediaSrc);
-
-router.get('/media/review', getReview);
-router.put('/media/review', putReview);
-router.delete('/media/review', deleteReview);
 
 router.get('/media/:id/mediaSrc/progress', getMediaSrcsAndProgress);
 
