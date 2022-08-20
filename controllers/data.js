@@ -140,7 +140,7 @@ export const getUser = async (req, res) => {
         model: 'MediaSrc',
         populate: {
           path: 'media',
-          select: { title: 1 },
+          select: { title: 1, type: 1 },
           model: 'Media',
         }
       }
