@@ -229,6 +229,13 @@ export const getUserKeepWatching = async (req, res) => {
 
 export const postUser = async (req, res) => {
   try {
+
+    const existentUser = User.findOne({ email: req.body.data.email });
+
+    if (existentUser) {
+      res.status(403).send({ message: 'User already exists.'});
+    }
+
     const hashedPassword = await bcrypt.hash(req.body.data.password, 10);
 
     const genres = await Genre.find();
@@ -256,7 +263,7 @@ export const postUser = async (req, res) => {
       view_logs: [],
       media_reviews: [],
       my_list: [],
-    });
+    });    
 
     createdUser.save( (err) => {
       if (err) {
