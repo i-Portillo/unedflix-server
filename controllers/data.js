@@ -124,7 +124,27 @@ export const deleteMedia = async (req, res) => {
 export const getUser = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user.id })
-    console.log('Getting user:', user.email);
+    .populate({
+      path: 'media_reviews',
+      populate: {
+        path: 'media',
+        select: { title: 1 },
+        model: 'Media',
+      }
+    })
+    .populate({
+      path: 'view_logs',
+      populate: {
+        path: 'media_src',
+        select: { media: 1, title: 1 },
+        model: 'MediaSrc',
+        populate: {
+          path: 'media',
+          select: { title: 1 },
+          model: 'Media',
+        }
+      }
+    });
     res.send(user);
   } catch(err) {
     console.log(err);
