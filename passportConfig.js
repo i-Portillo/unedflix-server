@@ -29,7 +29,8 @@ export default (passport) => {
       const userData = {
         id: user._id,
         email: user.email,
-        role: user.role
+        role: user.role,
+        subscription_status: user.subscription_status,
       };
       done(err, userData);
     });
