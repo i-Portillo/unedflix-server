@@ -227,10 +227,19 @@ export const getUserKeepWatching = async (req, res) => {
   }
 }
 
+export const getUserBankDetails = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.user.id }, 'bank_details');
+    res.status(200).send(user.bank_details);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export const postUser = async (req, res) => {
   try {
 
-    const existentUser = User.findOne({ email: req.body.data.email });
+    const existentUser = await User.findOne({ email: req.body.data.email });
 
     if (existentUser) {
       res.status(403).send({ message: 'User already exists.'});
