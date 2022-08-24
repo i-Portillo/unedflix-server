@@ -272,6 +272,7 @@ export const postUser = async (req, res) => {
       view_logs: [],
       media_reviews: [],
       my_list: [],
+      last_payment: Date.now(),
     });    
 
     createdUser.save( (err) => {

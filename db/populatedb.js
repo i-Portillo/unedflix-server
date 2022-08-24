@@ -178,8 +178,17 @@ const buildUser = async (obj, cb) => {
       zip_code: obj.zip_code,
       bank_details: obj.bank_details,
       subscription_status: obj.subscription_status,
-      // genre_affinity: affinities
     });
+
+    const lastPayment = new Date();
+
+    if (obj.subscription_status === 'Active') {
+      lastPayment.setDate(lastPayment.getDate() - (Math.ceil(Math.random(20))));
+    } else {
+      lastPayment.setDate(lastPayment.getDate() - (Math.ceil(Math.random(150)) + 30));
+    }
+
+    user.last_payment = lastPayment;
 
     const mediaQty = (Math.ceil((Math.random() * 20) + 10)); // Sets a random amount [11-30] of viewLogs to be generated per user
 
@@ -191,7 +200,7 @@ const buildUser = async (obj, cb) => {
           user: user,
           media_src: media.media_src[0][0],
           date: new Date(),
-          progress: (Math.random() > 0.05 ? 100 : Math.floor(Math.random() * 90))
+          progress: (Math.random() > 0.10 ? 100 : Math.floor(Math.random() * 90))
         })
 
         user.view_logs.push(viewLog);

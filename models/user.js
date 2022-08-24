@@ -24,6 +24,7 @@ const UserSchema = new Schema(
       media: { type: Schema.Types.ObjectId, ref: 'Media'},
       added: { type: Date }
     } ],
+    last_payment: { type: Date },
   }
 )
 
