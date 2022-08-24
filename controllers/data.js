@@ -559,3 +559,15 @@ export const getListedData = async (req, res) => {
     console.log(err);
   }
 }
+
+export const postFile = async (req, res) => {
+  try {
+    const file = req.files.file;
+    const path = `public${req.body.path}`;
+    const fileName = req.body.fileName;
+    await file.mv(`${path}${fileName}`);
+    res.status(200).send({ message: 'File uploaded.'});
+  } catch(err) {
+    console.log(err);
+  }
+}
