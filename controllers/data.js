@@ -351,7 +351,22 @@ export const getQuery = async (req, res) => {
 export const getGenres = async (req, res) => {
   try {
     const genres = await Genre.find();
+    genres.sort( (a,b) => {
+      if (a.name < b.name) return -1;
+      return 1;
+    });
     res.status(200).send(genres);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const postGenre = async (req, res) => {
+  try {
+    const newGenre = await new Genre({ name: req.body.genre });
+    await newGenre.save();
+    await User.updateMany({}, { $push: { genre_affinity: { genre: req.body.genre, value: 50 } }});
+    res.status(200).send(newGenre);
   } catch(err) {
     console.log(err);
   }
