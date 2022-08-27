@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteMediaFromList, deleteReview, getMedias, getGenres, getMediaInList, getMediaSrc, getQuery, getReview, getUser, getUserGenres, getUserList, getUserReviews, getUserKeepWatching, getUserRole, getUsers, getViewLog, putMediaInList, putReview, putViewLog, getMediaSrcsAndProgress, getUserViewLogs, putUserData, deleteUser, postUser, putMediaData, deleteMedia, postMedia, getMediaReviewData, getListedData, putUserPassword, getUserBankDetails, postFile, postGenre } from '../controllers/data.js';
+import { deleteMediaFromList, deleteReview, getMedias, getGenres, getMediaInList, getMediaSrc, getQuery, getReview, getUser, getUserGenres, getUserList, getUserReviews, getUserKeepWatching, getUserRole, getUsers, getViewLog, putMediaInList, putReview, putViewLog, getMediaSrcsAndProgress, getUserViewLogs, putUserData, deleteUser, postUser, putMediaData, deleteMedia, postMedia, getMediaReviewData, getListedData, putUserPassword, getUserBankDetails, postFile, postGenre, backupDB, restoreDB } from '../controllers/data.js';
 
 export const router = express.Router();
 
@@ -52,5 +52,8 @@ router.get('/media/:mediaId/reviewData', getMediaReviewData);
 router.get('/media/:mediaId/listedData', getListedData);
 
 router.post('/upload', postFile);
+
+router.get('/db/backup', backupDB);
+router.post('/db/restore', restoreDB);
 
 export default router;
