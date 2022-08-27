@@ -5,3 +5,4 @@ public/images
 ignore.*
 public/media
 public/favicon.ico
+dump/

@@ -22,6 +22,7 @@
     "nodemon": "^2.0.16"
   },
   "scripts": {
+    "devStart": "nodemon --ignore dump/ app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
