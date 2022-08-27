@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { exec, execSync } from 'child_process';
 
 import User from "../models/user.js";
 import Genre from "../models/genre.js";
@@ -582,6 +583,41 @@ export const postFile = async (req, res) => {
     const fileName = req.body.fileName;
     await file.mv(`${path}${fileName}`);
     res.status(200).send({ message: 'File uploaded.'});
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const backupDB = async (req, res) => {
+  try {
+    const date = new Date();
+    execSync(`mongodump --uri=${process.env.MONGODB} --archive=dump/unedflix_dump`, (error, stdout, stderr) => {
+      if (error) {
+          console.log(`error: ${error.message}`);
+          return;
+      }
+      if (stderr) {
+          console.log(`stderr: ${stderr}`);
+          return;
+      }
+      console.log(`stdout: ${stdout}`);
+    });
+    res.status(200).sendFile('/dump/unedflix_dump', { root: '.' });
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export const restoreDB = async (req, res) => {
+  try {
+    const file = req.files.file;
+    const path = `dump${req.body.path}`;
+    const fileName = req.body.fileName;
+    await file.mv(`${path}${fileName}`);
+    execSync(`mongo unedflix --eval 'db.dropDatabase()'`);
+    execSync(`mongorestore --archive=./${path}${fileName}`);
+    res.status(200).send({ message: 'DB restored.' });
   } catch(err) {
     console.log(err);
   }
