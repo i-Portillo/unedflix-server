@@ -622,3 +622,42 @@ export const restoreDB = async (req, res) => {
     console.log(err);
   }
 }
+
+export const getMostLiked = async (req, res) => {
+  try {
+    const sorted = await MediaReview.aggregate([ {'$match': { 'feedback': true }} ]).sortByCount('media');
+    const mostLikedMedias = await Promise.all(sorted.slice(0,20).map( async (media) => {
+      const foundMedia = await Media.findOne({ _id: media._id }, 'title');
+      return { media: foundMedia, count: media.count };
+    }))
+    res.status(200).send(mostLikedMedias);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const getMostDisliked = async (req, res) => {
+  try {
+    const sorted = await MediaReview.aggregate([ {'$match': { 'feedback': false }} ]).sortByCount('media');
+    const mostDislikedMedias = await Promise.all(sorted.slice(0,20).map( async (media) => {
+      const foundMedia = await Media.findOne({ _id: media._id }, 'title');
+      return { media: foundMedia, count: media.count };
+    }))
+    res.status(200).send(mostDislikedMedias);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const getMostListed = async (req, res) => {
+  try {
+    const sorted = await User.aggregate([{ '$unwind': '$my_list' }]).sortByCount('my_list.media');
+    const mostListedMedias = await Promise.all(sorted.slice(0,20).map( async (media) => {
+      const foundMedia = await Media.findOne({ _id: media._id }, 'title');
+      return { media: foundMedia, count: media.count };
+    }))
+    res.status(200).send(mostListedMedias);
+  } catch(err) {
+    console.log(err);
+  }
+}
