@@ -1,5 +1,6 @@
 import express from 'express';
-import { deleteMediaFromList, deleteReview, getMedias, getGenres, getMediaInList, getMediaSrc, getQuery, getReview, getUser, getUserGenres, getUserList, getUserReviews, getUserKeepWatching, getUserRole, getUsers, getViewLog, putMediaInList, putReview, putViewLog, getMediaSrcsAndProgress, getUserViewLogs, putUserData, deleteUser, postUser, putMediaData, deleteMedia, postMedia, getMediaReviewData, getListedData, putUserPassword, getUserBankDetails, postFile, postGenre, backupDB, restoreDB, getMostLiked, getMostDisliked, getMostListed } from '../controllers/data.js';
+import { loggedIn } from '../controllers/auth.js';
+import { deleteMediaFromList, deleteReview, getMedias, getGenres, getMediaInList, getMediaSrc, getQuery, getReview, getUser, getUserGenres, getUserList, getUserReviews, getUserKeepWatching, getUserRole, getUsers, getViewLog, putMediaInList, putReview, putViewLog, getMediaSrcsAndProgress, getUserViewLogs, putUserData, deleteUser, postUser, putMediaData, deleteMedia, postMedia, getMediaReviewData, getListedData, putUserPassword, getUserBankDetails, postFile, postGenre, backupDB, restoreDB, getMostLiked, getMostDisliked, getMostListed, getMedia } from '../controllers/data.js';
 
 export const router = express.Router();
 
@@ -25,6 +26,7 @@ router.get('/media/review', getReview);
 router.put('/media/review', putReview);
 router.delete('/media/review', deleteReview);
 
+router.get('/media/:id', getMedia);
 router.put('/media', putMediaData);
 router.post('/media', postMedia);
 

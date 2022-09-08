@@ -22,3 +22,21 @@ export const signout = (req, res) => {
     req.session.destroy();
   });
 }
+
+export const loggedIn = (req, res, next) => {
+  console.log('test')
+  if (req.isAuthenticated()) {
+    console.log('Authenticated')
+    res.auth = true;
+    return next();
+  } else {
+    console.log('Not authenticated');
+    res.auth = false;
+    res.status(401);
+    res.send('Not authorized in loggedIn()')
+  }
+}
+
+export const allowThrough = (req, res, next) => {
+  res.status(200).send({ message: 'User authenticated', user: req.user });
+}

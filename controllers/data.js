@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { exec, execSync } from 'child_process';
+import { execSync } from 'child_process';
 
 import User from "../models/user.js";
 import Genre from "../models/genre.js";
@@ -18,6 +18,41 @@ export const getMedias = async (req, res) => {
       model: 'MediaSrc',
     });
     res.status(200).send(medias);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const getMediaData = async (genre) => {
+  return await Media.aggregate([
+    {
+      $lookup: {
+        from: 'genres',
+        localField: 'genres',
+        foreignField: '_id',
+        as: 'genres'
+      }
+    },
+    {
+      $match: {
+        'genres.name': genre
+      }
+    },
+    {
+      $project: {
+        "title": 1,
+        "poster": 1,
+        "genres": 1,
+        "type": 1,
+      }
+    }
+  ])
+}
+
+export const getMedia = async (req, res, next) => {
+  try {
+    const mediaData = await Media.findOne({ _id: req.params.id });
+    res.json(mediaData);
   } catch(err) {
     console.log(err);
   }
