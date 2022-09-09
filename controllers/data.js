@@ -8,6 +8,7 @@ import MediaReview from "../models/mediaReview.js";
 import MediaSrc from "../models/mediaSrc.js";
 import ViewLog from "../models/viewLog.js";
 import { decreaseAffinity, increaseAffinity } from "../suggestion_system/genreAffinity.js";
+import { arrangeByAffinity } from "../suggestion_system/suggestion.js"
 
 export const getMedias = async (req, res) => {
   try {
@@ -23,30 +24,53 @@ export const getMedias = async (req, res) => {
   }
 }
 
-export const getMediaData = async (genre) => {
-  return await Media.aggregate([
-    {
-      $lookup: {
-        from: 'genres',
-        localField: 'genres',
-        foreignField: '_id',
-        as: 'genres'
+export const getMediasList = async (req, res) => {
+
+  const getMediaData = async (genre) => {
+    return await Media.aggregate([
+      {
+        $lookup: {
+          from: 'genres',
+          localField: 'genres',
+          foreignField: '_id',
+          as: 'genres'
+        }
+      },
+      {
+        $match: {
+          'genres.name': genre
+        }
+      },
+      {
+        $project: {
+          "title": 1,
+          "poster": 1,
+          "genres": 1,
+          "type": 1,
+        }
       }
-    },
-    {
-      $match: {
-        'genres.name': genre
+    ])
+  }
+
+  try {
+    const user = await User.findOne({ _id: req.user.id })
+    .populate('media_reviews')
+    .populate({
+      path: 'view_logs',
+      populate: {
+        path: 'media_src',
+        select: { media: 1 },
+        model: 'MediaSrc'
       }
-    },
-    {
-      $project: {
-        "title": 1,
-        "poster": 1,
-        "genres": 1,
-        "type": 1,
-      }
-    }
-  ])
+    });
+
+    let media = await getMediaData(req.params.genre);
+    media = await arrangeByAffinity(user, media);
+
+    res.json(media);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 export const getMedia = async (req, res, next) => {
