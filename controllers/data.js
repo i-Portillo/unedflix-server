@@ -393,7 +393,7 @@ export const getUsers = async (req, res) => {
 }
 
 export const getQuery = async (req, res) => {
-  const query = req.query.searchQuery;
+  const query = req.params.query;
   try {
     const medias = await Media.find({
       $or: [

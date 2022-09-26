@@ -21,19 +21,9 @@ router.delete('/user/:user', deleteUser);
 
 router.get('/users', getUsers);
 
-router.get('/media/review', getReview);
-router.put('/media/review', putReview);
-router.delete('/media/review', deleteReview);
-
-router.get('/media/:id', getMedia);
-router.put('/media', putMediaData);
-router.post('/media', postMedia);
-router.delete('/media/:media', deleteMedia);
-
-router.get('/medias', getMedias);
-router.get('/medias/genre/:genre', getMediasList)
-
-router.get('/medias/search/', getQuery);
+router.get('/review', getReview);
+router.put('/review', putReview);
+router.delete('/review', deleteReview);
 
 router.get('/genres', getGenres);
 router.post('/genre', postGenre);
@@ -57,9 +47,19 @@ router.post('/upload', postFile);
 router.get('/db/backup', backupDB);
 router.post('/db/restore', restoreDB);
 
-router.get('/mediaReview/mostliked', getMostLiked);
-router.get('/mediaReview/mostdisliked', getMostDisliked);
+router.get('/review/mostliked', getMostLiked);
+router.get('/review/mostdisliked', getMostDisliked);
 
 router.get('/media/mostListed', getMostListed);
+
+router.get('/media/:id', getMedia);
+router.put('/media', putMediaData);
+router.post('/media', postMedia);
+router.delete('/media/:media', deleteMedia);
+
+router.get('/medias', getMedias);
+router.get('/medias/genre/:genre', getMediasList)
+
+router.get('/medias/search/:query', getQuery);
 
 export default router;
