@@ -8,9 +8,13 @@ const evaluateMedia = async (user, media, similarityTable) => {
   const genre = genreAf.evaluateMedia(media.genres.map(genre => genre.name), user.genre_affinity);
   const users = await userAf.evaluateMedia(media._id, user.media_reviews, similarityTable);
 
-  const randomness = 0.2;
+  const randomness = 0.1;
 
-  const evaluation = (((genre * 0.5) + (users * 0.5)) * (1 - randomness) ) + (Math.random() * randomness);
+  const random = Math.random() * 100;
+
+  const evaluation = (((genre * 0.5) + (users * 0.5)) * (1 - randomness) ) + (random * randomness);
+
+  // console.log(media.title, evaluation, genre, users, random)
 
   return evaluation;
 }
