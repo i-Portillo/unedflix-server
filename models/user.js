@@ -5,15 +5,15 @@ const UserSchema = new Schema(
   {
     email: { type: String, required: true },
     password: { type: String, required: true},
-    role: { type: String, required: true, default: 'user'},
+    role: { type: String, required: true, enum: ['user', 'employee', 'administrator'], default: 'user'},
     name: { type: String },
     family_name: { type: String },
     address: { type: String },
     city: { type: String },
     state: { type: String },
     zip_code: { type: String },
-    bank_details: { type: String },
-    subscription_status: { type: String },
+    bank_details: { type: String, required: true },
+    subscription_status: { type: String, required: true, default: 'Active' },
     genre_affinity: [{
       genre: { type: String },
       value: { type: Number }

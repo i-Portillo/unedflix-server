@@ -9,13 +9,10 @@ const MediaSchema = new Schema(
     overview: { type: String },
     type: { type: String },
     director: { type: [String] },
-    runtime: { type: Number },
     release_date: { type: Date },
-    rating: { type: Number },
     cast: { type: [String] },
     production: { type: String },
-    imdb_id: { type: String },
-    poster: { type: String },
+    poster: { type: String, required: true },
     updated: { type: Date },
     media_src: [ [ { type: Schema.Types.ObjectId, ref: 'MediaSrc'} ] ]
   }

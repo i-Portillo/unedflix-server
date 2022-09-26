@@ -3,9 +3,9 @@ const Schema = mongoose.Schema;
 
 const MediaReviewSchema = new Schema(
   {
-    feedback: Boolean,
-    user: { type: Schema.Types.ObjectId, ref: 'User'},
-    media: { type: Schema.Types.ObjectId, ref: 'Media'},
+    feedback: { type: Boolean, required: true },
+    user: { type: Schema.Types.ObjectId, required: true, ref: 'User'},
+    media: { type: Schema.Types.ObjectId, required: true,  ref: 'Media'},
   }
 );
 
