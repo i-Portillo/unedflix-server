@@ -13,10 +13,22 @@ const MediaSchema = new Schema(
     cast: { type: [String] },
     production: { type: String },
     poster: { type: String, required: true },
+    runtime: { type: Number },
     updated: { type: Date },
     media_src: [ [ { type: Schema.Types.ObjectId, ref: 'MediaSrc'} ] ]
-  }
+  },
+  { toJSON: { virtuals: true } }
 )
+
+MediaSchema.virtual('number_of_episodes').get(function() {
+  let number = 0;
+  if (this.media_src) {
+    this.media_src.forEach(season => {
+      number += season.length;
+    });
+  }
+  return number;
+})
 
 // Export model
 export default mongoose.model('Media', MediaSchema);

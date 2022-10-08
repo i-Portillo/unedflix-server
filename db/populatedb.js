@@ -56,6 +56,7 @@ const buildMovie = async (obj, cb) => {
     cast: obj.cast,
     director: obj.director,
     production: obj.production,
+    runtime: obj.runtime,
     poster: `/images/movie_posters/${obj.media_id}.jpg`,
     updated: obj.release_date,
   })

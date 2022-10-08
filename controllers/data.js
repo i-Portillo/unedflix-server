@@ -129,6 +129,10 @@ export const postMedia = async (req, res) => {
       updated: mediaData.updated,
     })
 
+    if (newMedia.type === 'Movie') {
+      newMedia.runtime = mediaData.runtime;
+    }
+
     const mediaSrcs = await Promise.all(mediaData.media_src.map( async season => {
       const episodes = await Promise.all(season.map( async episode => {
         const newSrc = new MediaSrc({
