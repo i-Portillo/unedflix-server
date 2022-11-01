@@ -181,6 +181,14 @@ const buildUser = async (obj, cb) => {
       subscription_status: obj.subscription_status,
     });
 
+    if (user.email === 'iportillo@email.com' || user.email === 'admin@email.com') {
+      user.role = 'admin'
+    } else if (user.email === 'employee@email.com') {
+      user.role = 'employee'
+    } else {
+      user.role = 'user'
+    }
+
     const lastPayment = new Date();
 
     if (obj.subscription_status === 'Active') {
