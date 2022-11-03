@@ -4,7 +4,7 @@ export const signin = (req, res) => {
   passport.authenticate("local", (err, user, info) => {
     console.log('start authenticate')
     if (err) { console.log(err) };
-    if (!user) return res.status(404).json({ message: "User doesn't exist."});
+    if (!user) return res.status(401).json({ message: "Invalid credentials."});
     else {
       req.logIn(user, (err) => {
         if (err) { console.log(err) };
